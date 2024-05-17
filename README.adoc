@@ -1,0 +1,160 @@
+= ST/ORM
+
+ST/ORM is a lightweight, simple and easy to use SQL Template and ORM for Java 21 and higher.
+
+## Features
+
+- Simple and easy to use
+- Lightweight
+- No dependencies
+- Supports all SQL databases
+
+
+== Level 1 - Parameter Binding Template
+
+[source,java,indent=0]
+----
+    public class JPAExample {
+
+        @PersistenceContext
+        private EntityManager entityManager;
+
+        public List findByBirthDate(LocalDate birthDate) {
+            var JPA = JpaTemplate.of(entityManager);
+            Query query = JPA."""
+                SELECT *
+                FROM pet
+                WHERE birth_date = \{birthDate}""";
+            return query.getResultList();
+        }
+    }
+----
+
+
+[source,java,indent=0]
+----
+    public class PreparedStatementExample {
+
+        @Autowired
+        private DataSource dataSource;
+
+        public List<Pet> findByBirthDate(LocalDate birthDate) {
+            var PS = PreparedStatementTemplate.of(dataSource);
+            try (PreparedStatement statement = PS."""
+                        SELECT *
+                        FROM pet
+                        WHERE birth_date = \{birthDate}""";
+                    ResultSet resultSet = statement.executeQuery()) {
+                List<Pet> pets = new ArrayList<>();
+                while (resultSet.next()) {
+                    // ...
+                }
+                return pets;
+            }
+        }
+    }
+----
+
+
+== Level 2 - ORM Template
+
+[source,java,indent=0]
+----
+    public record Pet(
+            @PK Integer id,
+            String name,
+            LocalDate birthDate,
+            PetType petType,
+            @FK Owner owner
+    ) {}
+
+    public record Owner(
+            @PK Integer id,
+            String firstName,
+            String lastName,
+            @Inline Address address,
+            String telephone
+    ) {}
+----
+
+[source,java,indent=0]
+----
+
+    public class ORMTemplateExample {
+
+        public List<Pet> findByOwner(Owner owner) {
+            var ORM = ORM(dataSource);
+            try (var query = ORM."""
+                    SELECT \{Pet.class}
+                    FROM \{Pet.class}
+                    WHERE \{owner}""") {
+                return query.getResultList(Pet.class);
+            }
+        }
+    }
+----
+
+== Level 3 - ORM Repository
+
+[source,java,indent=0]
+----
+    public record Pet(
+            @PK Integer id,
+            @Nonnull String name,
+            @Nonnull LocalDate birthDate,
+            @Nonnull PetType petType,
+            @Nullable @FK Owner owner
+    ) implements Entity<Integer> {}
+----
+
+[source,java,indent=0]
+----
+    public class ORMRepositoryExample {
+
+        public Stream<Pet> findByBirthDate(LocalDate birthDate) {
+            var R = ORM(dataSource).repository(Pet.class);
+            return R."WHERE birth_date = \{birthDate}";
+        }
+
+        public Stream<Pet> findByOwner(Owner owner) {
+            var R = ORM(dataSource).repository(Pet.class);
+            return R.selectByFk(owner);
+        }
+
+        public Stream<Pet> findByOwnerFirstName(String firstName) {
+            var R = ORM(dataSource).repository(Pet.class);
+            return R.select()."WHERE \{Owner.class}.first_name = \{firstName}";
+        }
+    }
+----
+
+[source,java,indent=0]
+----
+    public interface PetRepository extends EntityRepository<Pet> {
+
+        default Stream<Pet> findByOwnerCity(String city) {
+            return this."WHERE \{Owner.class}.city = \{city}";
+        }
+
+        default insert(List<Pet> pets) {
+            var bindVars = createBindVars();
+            try (var query = ORM()."""
+                    INSERT INTO \{Pet.class}
+                    VALUES \{bindVars}""".prepare()) {
+                pets.forEach(query::addBatch);
+                query.executeUpdate();
+            }
+        }
+
+        default update(List<Pet> pets) {
+            var bindVars = createBindVars();
+            try (var query = ORM()."""
+                    UPDATE \{Pet.class}
+                    SET \{bindVars}
+                    WHERE \{bindVars}""".prepare()) {
+                pets.forEach(query::addBatch);
+                query.executeUpdate();
+            }
+        }
+    }
+----
