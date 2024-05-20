@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- *
+ * Interface for classes that can be ordered.
  */
 public interface Orderable<T extends Orderable<T>> {
 

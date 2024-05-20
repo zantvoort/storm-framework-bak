@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
-public class Elements {
+public final class Elements {
     public record Select(@Nonnull Class<? extends Record> table) implements Element {
         public Select {
             requireNonNull(table, "table");

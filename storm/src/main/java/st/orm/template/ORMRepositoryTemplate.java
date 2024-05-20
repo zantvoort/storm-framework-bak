@@ -18,5 +18,4 @@ package st.orm.template;
 import st.orm.repository.RepositoryLookup;
 
 public interface ORMRepositoryTemplate extends ORMTemplate, RepositoryLookup {
-
 }

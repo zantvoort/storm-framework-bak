@@ -45,7 +45,7 @@ import java.util.function.Predicate;
 import static java.lang.System.identityHashCode;
 import static st.orm.template.SqlTemplate.aroundInvoke;
 
-public class ORMRepositoryTemplateImpl extends ORMTemplateImpl implements ORMRepositoryTemplate {
+public final class ORMRepositoryTemplateImpl extends ORMTemplateImpl implements ORMRepositoryTemplate {
 
     private static final ORMReflection REFLECTION = Providers.getORMReflection();
 

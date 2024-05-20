@@ -363,8 +363,8 @@ public class QueryBuilderImpl<T, R, ID> implements QueryBuilder<T, R, ID> {
      * Generates a stream of slices. This method is designed to facilitate batch processing of large streams by
      * dividing the stream into smaller manageable slices, which can be processed independently.
      *
-     * The method utilizes a "tripwire" mechanism to ensure that the original stream is properly managed and closed upon
-     * completion of processing, preventing resource leaks.
+     * <p>The method utilizes a "tripwire" mechanism to ensure that the original stream is properly managed and closed upon
+     * completion of processing, preventing resource leaks.</p>
      *
      * @param <X> the type of elements in the stream.
      * @param stream the original stream of elements to be sliced.
@@ -381,12 +381,12 @@ public class QueryBuilderImpl<T, R, ID> implements QueryBuilder<T, R, ID> {
      * size. This method is designed to facilitate batch processing of large streams by dividing the stream into
      * smaller manageable slices, which can be processed independently.
      *
-     * If the specified size is equal to {@code Integer.MAX_VALUE}, this method will return a single slice containing
+     * <p>If the specified size is equal to {@code Integer.MAX_VALUE}, this method will return a single slice containing
      * the original stream, effectively bypassing the slicing mechanism. This is useful for operations that can handle
-     * all elements at once without the need for batching.
+     * all elements at once without the need for batching.</p>
      *
-     * The method utilizes a "tripwire" mechanism to ensure that the original stream is properly managed and closed upon
-     * completion of processing, preventing resource leaks.
+     * <p>The method utilizes a "tripwire" mechanism to ensure that the original stream is properly managed and closed upon
+     * completion of processing, preventing resource leaks.</p>
      *
      * @param <X> the type of elements in the stream.
      * @param stream the original stream of elements to be sliced.

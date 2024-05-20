@@ -52,14 +52,34 @@ import static java.util.Objects.requireNonNull;
  */
 public interface Templates {
 
+    /**
+     * Returns an {@link ORMTemplate} for use with JPA.
+     *
+     * @param entityManager the entity manager to use.
+     * @return an {@link ORMTemplate} for use with JPA.
+     */
     static ORMTemplate ORM(@Nonnull EntityManager entityManager) {
         return new JpaTemplateImpl(entityManager).toORM();
     }
 
+    /**
+     * Returns an {@link ORMRepositoryTemplate} for use with JDBC.
+     *
+     * @param dataSource the data source to use.
+     * @return an {@link ORMRepositoryTemplate} for use with JDBC.
+     */
     static ORMRepositoryTemplate ORM(@Nonnull DataSource dataSource) {
         return new PreparedStatementTemplateImpl(dataSource).toORM();
     }
 
+    /**
+     * Returns an {@link ORMRepositoryTemplate} for use with JDBC.
+     *
+     * <p>The caller is responsible for closing the connection after usage.</p>
+     *
+     * @param connection the connection to use.
+     * @return an {@link ORMRepositoryTemplate} for use with JDBC.
+     */
     static ORMRepositoryTemplate ORM(@Nonnull Connection connection) {
         return new PreparedStatementTemplateImpl(connection).toORM();
     }

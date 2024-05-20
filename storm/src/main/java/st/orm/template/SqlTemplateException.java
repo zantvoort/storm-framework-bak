@@ -18,18 +18,34 @@ package st.orm.template;
 import java.sql.SQLException;
 
 /**
- *
+ * Thrown to indicate an error occurred while processing a SQL template.
  */
 public class SqlTemplateException extends SQLException {
 
+    /**
+     * Constructs a new exception with the specified reason.
+     *
+     * @param reason the reason for the exception.
+     */
     public SqlTemplateException(String reason) {
         super(reason);
     }
 
+    /**
+     * Constructs a new exception with the specified reason and cause.
+     *
+     * @param cause the cause of the exception.
+     */
     public SqlTemplateException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a new exception with the specified reason and cause.
+     *
+     * @param reason the reason for the exception.
+     * @param cause the cause of the exception.
+     */
     public SqlTemplateException(String reason, Throwable cause) {
         super(reason, cause);
     }

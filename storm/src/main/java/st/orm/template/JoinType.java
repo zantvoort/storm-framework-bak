@@ -24,9 +24,17 @@ import st.orm.template.impl.SqlTemplateImpl.DefaultJoinType;
  * be created by implementing this interface.
  */
 public interface JoinType {
+
+    /** The default inner join type. */
     static JoinType inner() { return DefaultJoinType.INNER; }
+
+    /** The default cross join type. */
     static JoinType cross() { return DefaultJoinType.CROSS; }
+
+    /** The default left join type. */
     static JoinType left() { return DefaultJoinType.LEFT; }
+
+    /** The default right join type. */
     static JoinType right() { return DefaultJoinType.RIGHT; }
 
     /**

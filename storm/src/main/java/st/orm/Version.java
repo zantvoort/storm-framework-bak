@@ -23,7 +23,25 @@ import static java.lang.annotation.ElementType.RECORD_COMPONENT;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Marks a record component as a version field.
+ * Marks a record component as a version field to detect optimistic locking conflicts.
+ *
+ * <p>
+ * The following numerical types are supported:
+ * <ul>
+ *     <li>{@code int}</li>
+ *     <li>{@code long}</li>
+ *     <li>{@code java.lang.Integer}</li>
+ *     <li>{@code java.lang.Long}</li>
+ *     <li>{@code java.math.BigInteger}</li>
+ * </ul>
+ * The following types are supported for timestamp fields:
+ * <ul>
+ *     <li>{@code java.time.Instant}</li>
+ *     <li>{@code java.util.Date}</li>
+ *     <li>{@code java.util.Calendar}</li>
+ *     <li>{@code java.sql.Timestamp}</li>
+ * </ul>
+ * </p>
  */
 @Target({RECORD_COMPONENT, PARAMETER})
 @Retention(RUNTIME)

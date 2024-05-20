@@ -28,26 +28,30 @@ import java.util.function.Consumer;
 
 import static st.orm.template.impl.SqlTemplateImpl.CONSUMERS;
 
+/**
+ * A template processor for generating SQL queries.
+ */
 public interface SqlTemplate extends Templates, StringTemplate.Processor<Sql, SqlTemplateException> {
 
+    /**
+     * The strategy to use when resolving table aliases.
+     */
     enum AliasResolveStrategy {
         /**
          * Resolve all aliases for a table, if multiple exist.
          *
-         * This is the safest option to prevent undesired results, but may fail in some cases. If the same table is
+         * <p>This is the safest option to prevent undesired results, but may fail in some cases. If the same table is
          * present multiple types in an entity hierarchy, all the relations will be included in case of a WHERE clause.
-         * However, if a single alias is requested, the request will fail because of the ambiguity.
-         *
-         *
+         * However, if a single alias is requested, the request will fail because of the ambiguity.</p>
          */
         ALL,
 
         /**
          * Resolve the first alias for a table, if multiple exist.
          *
-         * This option never fails, but may have undesired side effects. If the same table is present multiple times in
-         * an entity hierarchy, only the first relation will be included in case of a WHERE clause. This may lead to
-         * unexpected results.
+         * <p>This option never fails, but may have undesired side effects. If the same table is present multiple times
+         * in an entity hierarchy, only the first relation will be included in case of a WHERE clause. This may lead to
+         * unexpected results.</p>
          */
         FIRST,
 

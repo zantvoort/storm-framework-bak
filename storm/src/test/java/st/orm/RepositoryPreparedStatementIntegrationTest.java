@@ -91,6 +91,16 @@ public class RepositoryPreparedStatementIntegrationTest {
     }
 
     @Test
+    public void testSelectCountCustomClass() {
+        record Count(Owner owner, int value) {}
+        var ORM = ORM(dataSource);
+        var query = ORM."SELECT \{Owner.class}, COUNT(*) FROM \{Pet.class} GROUP BY \{Owner.class}.id";
+        var result = query.getResultList(Count.class);
+        assertEquals(10, result.size());
+        assertEquals(12, result.stream().mapToInt(Count::value).sum());
+    }
+
+    @Test
     public void testInsert() {
         var repository = ORM(dataSource).repository(Vet.class);
         Vet vet1 = Vet.builder().firstName("Noel").lastName("Fitzpatrick").build();

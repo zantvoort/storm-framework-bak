@@ -30,6 +30,15 @@ import java.util.stream.Stream;
  */
 public interface Query {
 
+    /**
+     * Prepares the query for execution.
+     *
+     * <p>Queries are normally constructed in a lazy fashion, unlike prepared queries which are constructed eagerly.
+     * Prepared queries allow the use of bind variables and enable reading generated keys after row insertion.</p>
+     *
+     * @return the prepared query.
+     * @throws PersistenceException if the query preparation fails.
+     */
     PreparedQuery prepare();
 
     /**
@@ -119,6 +128,11 @@ public interface Query {
      * <p>Each element in the stream represents a row in the result, where the columns of the row corresponds to the
      * order of values in the row array.</p>
      *
+     * <p>The resulting stream will automatically close the underlying resources when a terminal operation is
+     * invoked, such as {@code collect}, {@code forEach}, or {@code toList}, among others. If no terminal operation is
+     * invoked, the stream will not close the resources, and it's the responsibility of the caller to ensure that the
+     * stream is properly closed to release the resources.</p>
+     *
      * @return the result stream.
      * @throws PersistenceException if the query fails.
      */
@@ -129,6 +143,11 @@ public interface Query {
      *
      * <p>Each element in the stream represents a row in the result, where the columns of the row are mapped to the
      * constructor arguments of the specified {@code type}.</p>
+     *
+     * <p>The resulting stream will automatically close the underlying resources when a terminal operation is
+     * invoked, such as {@code collect}, {@code forEach}, or {@code toList}, among others. If no terminal operation is
+     * invoked, the stream will not close the resources, and it's the responsibility of the caller to ensure that the
+     * stream is properly closed to release the resources.</p>
      *
      * @param type the type of the result.
      * @return the result stream.

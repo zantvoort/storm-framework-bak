@@ -52,7 +52,7 @@ import static java.util.Objects.requireNonNull;
 import static st.orm.Templates.unsafe;
 import static st.orm.template.impl.SqlTemplateImpl.getLazyRecordType;
 
-public class ORMTemplateImpl implements ORMTemplate {
+class ORMTemplateImpl implements ORMTemplate {
     private static final ORMReflection REFLECTION = Providers.getORMReflection();
 
     private final QueryFactory factory;

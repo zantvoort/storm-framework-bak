@@ -43,9 +43,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 /**
- * Helper class for loading providers from the query framework.
- *
- * @author Leon van Zantvoort
+ * Helper class for loading providers from the storm framework.
  */
 public final class Providers {
 

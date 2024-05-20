@@ -22,15 +22,33 @@ import jakarta.persistence.Query;
 import st.orm.Templates;
 import st.orm.template.impl.JpaTemplateImpl;
 
+/**
+ * Provides access to JPA templates.
+ */
 public interface JpaTemplate extends Templates, StringTemplate.Processor<Query, PersistenceException> {
 
+    /**
+     * Creates a new JPA template for the given entity manager.
+     *
+     * @param entityManager the entity manager.
+     * @return the JPA template.
+     */
     static JpaTemplate of(@Nonnull EntityManager entityManager) {
         return new JpaTemplateImpl(entityManager);
     }
 
+    /**
+     * Creates a new ORM template for the given entity manager.
+     *
+     * @param entityManager the entity manager.
+     * @return the ORM template.
+     */
     static ORMTemplate ORM(@Nonnull EntityManager entityManager) {
         return new JpaTemplateImpl(entityManager).toORM();
     }
 
+    /**
+     * Returns a ORM template for this JPA template.
+     */
     ORMTemplate toORM();
 }

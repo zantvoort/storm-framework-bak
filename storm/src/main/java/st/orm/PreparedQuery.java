@@ -21,7 +21,8 @@ import jakarta.persistence.PersistenceException;
 import java.util.stream.Stream;
 
 /**
- *
+ * Represents a prepared query that can be executed multiple times, allows adding records to a batch and retrieving
+ * generated keys.
  */
 public interface PreparedQuery extends Query, AutoCloseable {
 
