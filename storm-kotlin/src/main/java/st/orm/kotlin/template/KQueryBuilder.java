@@ -34,21 +34,17 @@ public interface KQueryBuilder<T, R, ID> extends StringTemplate.Processor<Stream
         KQueryBuilder<T, R, ID> template(@Nonnull TemplateFunction function);
     }
 
-    interface KPredicateBuilder<T, R, ID> extends StringTemplate.Processor<KWhereBuilder<T, R, ID>, PersistenceException> {
-        KWhereBuilder<T, R, ID> template(@Nonnull TemplateFunction function);
+    interface KWhereBuilder<T, R, ID> extends StringTemplate.Processor<KPredicateBuilder<T, R, ID>, PersistenceException> {
+        KPredicateBuilder<T, R, ID> template(@Nonnull TemplateFunction function);
 
-        KWhereBuilder<T, R, ID> where(@Nonnull Object o);
+        KPredicateBuilder<T, R, ID> matches(@Nonnull Object o);
     }
 
-    interface KWhereBuilder<T, R, ID> {
+    interface KPredicateBuilder<T, R, ID> {
 
-        KWhereBuilder<T, R, ID> and(@Nonnull Function<KPredicateBuilder<T, R, ID>, KWhereBuilder<T, R, ID>> predicate);
+        KPredicateBuilder<T, R, ID> and(@Nonnull KPredicateBuilder<T, R, ID> predicate);
 
-        KWhereBuilder<T, R, ID> or(@Nonnull Function<KPredicateBuilder<T, R, ID>, KWhereBuilder<T, R, ID>> predicate);
-
-        KWhereBuilder<T, R, ID> and(@Nonnull Object o);
-
-        KWhereBuilder<T, R, ID> or(@Nonnull Object o);
+        KPredicateBuilder<T, R, ID> or(@Nonnull KPredicateBuilder<T, R, ID> predicate);
     }
 
     <X extends Record> KQueryBuilder<T, X, ID> select(@Nonnull KClass<X> resultType);
@@ -80,10 +76,10 @@ public interface KQueryBuilder<T, R, ID> extends StringTemplate.Processor<Stream
     KJoinBuilder<T, R, ID> join(@Nonnull JoinType type, @Nonnull String alias, @Nonnull TemplateFunction function);
 
     default KQueryBuilder<T, R, ID> where(@Nonnull Object o) {
-        return where(predicate -> predicate.where(o));
+        return where(predicate -> predicate.matches(o));
     }
 
-    KQueryBuilder<T, R, ID> where(@Nonnull Function<KPredicateBuilder<T, R, ID>, KWhereBuilder<T, R, ID>> predicate);
+    KQueryBuilder<T, R, ID> where(@Nonnull Function<KWhereBuilder<T, R, ID>, KPredicateBuilder<T, R, ID>> predicate);
 
     KQueryBuilder<T, R, ID> withTemplate(@Nonnull TemplateFunction function);
 

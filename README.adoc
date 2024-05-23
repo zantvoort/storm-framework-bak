@@ -15,8 +15,10 @@ ST/ORM is a lightweight, simple and easy to use SQL Template and ORM for Java 21
 [source,java,indent=0]
 ----
 public class JPAExample {
+
     @PersistenceContext
     private EntityManager entityManager;
+
     public List findByBirthDate(LocalDate birthDate) {
         var JPA = JpaTemplate.of(entityManager);
         Query query = JPA."""
@@ -32,6 +34,7 @@ public class JPAExample {
 [source,java,indent=0]
 ----
 public class PreparedStatementExample {
+
     @Autowired
     private DataSource dataSource;
     public List<Pet> findByBirthDate(LocalDate birthDate) {
@@ -131,23 +134,27 @@ The following example demonstrates how `ORM(datasource).repository(Pet.class)` r
 [source,java,indent=0]
 ----
 public class ORMRepositoryExample {
+
     public Stream<Pet> findByBirthDate(LocalDate birthDate) {
         // Request a repository for the Pet entity.
         var R = ORM(dataSource).repository(Pet.class);
         // Add a custom WHERE clause. Uses the auto parameter binding feature.
         return R."WHERE birth_date = \{birthDate}";
     }
+
     public Stream<Pet> findByOwner(Owner owner) {
         var R = ORM(dataSource).repository(Pet.class);
         // Select all pets that belong to the owner, Uses the auto join feature based on @FK relationships.
-        return R.selectWhere(owner);
+        return R.selectMatches(owner);
     }
+
     public Stream<Pet> findByOwnerFirstName(String firstName) {
         var R = ORM(dataSource).repository(Pet.class);
         // Select all pets that belong to an owner with the specified first name. Uses the
         // auto alias feature and parameter binding.
         return R.select()."WHERE \{Owner.class}.first_name = \{firstName}";
     }
+
     public Pet create(String name, PetType petType) {
         var R = ORM(dataSource).repository(Pet.class);
         // Create a new pet with the specified name and pet type.
@@ -167,11 +174,13 @@ The following logic shows howto create a custom repository with custom methods:
 [source,java,indent=0]
 ----
 public interface PetRepository extends EntityRepository<Pet> {
+
     default Stream<Pet> findByOwnerCity(String city) {
         // Select all pets that belong to an owner in the specified city. Uses the
         // auto alias feature and parameter binding.
         return this."WHERE \{Owner.class}.city = \{city}";
     }
+
     default insert(List<Pet> pets) {
         // Insert pets into the database with a batch statement. Uses bind variables.
         var bindVars = createBindVars();
@@ -183,6 +192,7 @@ public interface PetRepository extends EntityRepository<Pet> {
             query.executeUpdate();
         }
     }
+
     default update(List<Pet> pets) {
         // Updates pets with a batch statement. Uses bind variables.
         var bindVars = createBindVars();

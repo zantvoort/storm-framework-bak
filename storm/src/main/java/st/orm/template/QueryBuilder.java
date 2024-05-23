@@ -67,35 +67,31 @@ public interface QueryBuilder<T, R, ID> extends StringTemplate.Processor<Stream<
     }
 
     /**
-     * A builder for constructing predicates in the WHERE clause of the query.
+     * A builder for constructing the WHERE clause of the query.
      *
      * @param <T> the type of the table being queried.
      * @param <R> the type of the result.
      * @param <ID> the type of the primary key.
      */
-    interface PredicateBuilder<T, R, ID> extends StringTemplate.Processor<WhereBuilder<T, R, ID>, PersistenceException> {
+    interface WhereBuilder<T, R, ID> extends StringTemplate.Processor<PredicateBuilder<T, R, ID>, PersistenceException> {
 
-        WhereBuilder<T, R, ID> template(@Nonnull TemplateFunction function);
+        PredicateBuilder<T, R, ID> template(@Nonnull TemplateFunction function);
 
-        WhereBuilder<T, R, ID> where(@Nonnull Object o);
+        PredicateBuilder<T, R, ID> matches(@Nonnull Object o);
     }
 
     /**
-     * A builder for constructing the WHERE clause of the query using custom predicates.
+     * A builder for constructing the predicates of the WHERE clause of the query.
      *
      * @param <T> the type of the table being queried.
      * @param <R> the type of the result.
      * @param <ID> the type of the primary key.
      */
-    interface WhereBuilder<T, R, ID> {
+    interface PredicateBuilder<T, R, ID> {
 
-        WhereBuilder<T, R, ID> and(@Nonnull Function<PredicateBuilder<T, R, ID>, WhereBuilder<T, R, ID>> predicate);
+        PredicateBuilder<T, R, ID> and(@Nonnull PredicateBuilder<T, R, ID> predicate);
 
-        WhereBuilder<T, R, ID> or(@Nonnull Function<PredicateBuilder<T, R, ID>, WhereBuilder<T, R, ID>> predicate);
-
-        WhereBuilder<T, R, ID> and(@Nonnull Object o);
-
-        WhereBuilder<T, R, ID> or(@Nonnull Object o);
+        PredicateBuilder<T, R, ID> or(@Nonnull PredicateBuilder<T, R, ID> predicate);
     }
 
     /**
@@ -169,13 +165,24 @@ public interface QueryBuilder<T, R, ID> extends StringTemplate.Processor<Stream<
     JoinBuilder<T, R, ID> join(@Nonnull JoinType type, @Nonnull String alias, @Nonnull TemplateFunction function);
 
     default QueryBuilder<T, R, ID> where(@Nonnull Object o) {
-        return where(predicate -> predicate.where(o));
+        return where(predicate -> predicate.matches(o));
     }
 
-    QueryBuilder<T, R, ID> where(@Nonnull Function<PredicateBuilder<T, R, ID>, WhereBuilder<T, R, ID>> expression);
+    QueryBuilder<T, R, ID> where(@Nonnull Function<WhereBuilder<T, R, ID>, PredicateBuilder<T, R, ID>> expression);
 
+    /**
+     * Appends the query with the string provided by the specified template {@code function}.
+     *
+     * @param function function that provides the string to append to the query using String interpolation.
+     * @return the query builder.
+     */
     QueryBuilder<T, R, ID> withTemplate(@Nonnull TemplateFunction function);
 
+    /**
+     * Returns a processor that can be used to append the query with a string template.
+     *
+     * @return a processor that can be used to append the query with a string template.
+     */
     StringTemplate.Processor<QueryBuilder<T, R, ID>, PersistenceException> withTemplate();
 
     /**
@@ -199,10 +206,12 @@ public interface QueryBuilder<T, R, ID> extends StringTemplate.Processor<Stream<
     }
 
     /**
-     * Executes the query and resturns a stream of results.
+     * Appends the query with the string provided by the specified template {@code function}, executes the query, and
+     * returns a stream of results.
      *
-     * @param function
-     * @return
+     * @param function function that provides the string to append to the query using String interpolation.
+     * @return a stream of results.
+     * @throws PersistenceException if the query fails.
      */
     Stream<R> stream(@Nonnull TemplateFunction function);
 

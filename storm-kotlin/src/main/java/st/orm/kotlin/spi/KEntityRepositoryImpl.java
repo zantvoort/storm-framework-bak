@@ -106,8 +106,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity.
      */
     @Override
-    public long selectCount() {
-        return entityRepository.selectCount();
+    public long count() {
+        return entityRepository.count();
     }
 
     /**
@@ -141,7 +141,7 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      */
     @Override
     public boolean exists(@Nonnull ID id) {
-        return selectCount(Stream.of(id)) > 0;
+        return count(Stream.of(id)) > 0;
     }
 
     /**
@@ -592,8 +592,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public long selectCount(@Nonnull Stream<ID> ids) {
-        return entityRepository.selectCount(ids);
+    public long count(@Nonnull Stream<ID> ids) {
+        return entityRepository.count(ids);
     }
 
     /**
@@ -611,8 +611,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public long selectCount(@Nonnull Stream<ID> ids, int batchSize) {
-        return entityRepository.selectCount(ids, batchSize);
+    public long count(@Nonnull Stream<ID> ids, int batchSize) {
+        return entityRepository.count(ids, batchSize);
     }
 
     /**
@@ -638,8 +638,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entity parameter is null.
      */
     @Override
-    public Stream<E> selectWhere(@Nonnull Record record) {
-        return entityRepository.selectWhere(record);
+    public Stream<E> selectMatches(@Nonnull Record record) {
+        return entityRepository.selectMatches(record);
     }
 
     /**
@@ -670,8 +670,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entities parameter is null.
      */
     @Override
-    public <R extends Record> Stream<E> selectWhere(@Nonnull Iterable<R> entities) {
-        return entityRepository.selectWhere(entities);
+    public <R extends Record> Stream<E> selectMatches(@Nonnull Iterable<R> entities) {
+        return entityRepository.selectMatches(entities);
     }
 
     /**
@@ -689,8 +689,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entity parameter is null.
      */
     @Override
-    public long selectCountWhere(@Nonnull Record record) {
-        return entityRepository.selectCountWhere(record);
+    public long countMatches(@Nonnull Record record) {
+        return entityRepository.countMatches(record);
     }
 
     /**
@@ -726,8 +726,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entities parameter is null.
      */
     @Override
-    public <R extends Record> Stream<E> selectWhere(@Nonnull Stream<R> records) {
-        return entityRepository.selectWhere(records);
+    public <R extends Record> Stream<E> selectMatches(@Nonnull Stream<R> records) {
+        return entityRepository.selectMatches(records);
     }
 
     /**
@@ -758,8 +758,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entities parameter is null.
      */
     @Override
-    public <R extends Record> Stream<E> selectWhere(@Nonnull Stream<R> records, int batchSize) {
-        return entityRepository.selectWhere(records, batchSize);
+    public <R extends Record> Stream<E> selectMatches(@Nonnull Stream<R> records, int batchSize) {
+        return entityRepository.selectMatches(records, batchSize);
     }
 
     /**
@@ -775,8 +775,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public <R extends Record> long selectCountWhere(@Nonnull Iterable<R> records) {
-        return entityRepository.selectCountWhere(records);
+    public <R extends Record> long countMatches(@Nonnull Iterable<R> records) {
+        return entityRepository.countMatches(records);
     }
 
     /**
@@ -792,8 +792,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public <R extends Record> long selectCountWhere(@Nonnull Stream<R> records) {
-        return entityRepository.selectCountWhere(records);
+    public <R extends Record> long countMatches(@Nonnull Stream<R> records) {
+        return entityRepository.countMatches(records);
     }
 
     /**
@@ -812,8 +812,8 @@ public final class KEntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public <R extends Record> long selectCountWhere(@Nonnull Stream<R> records, int batchSize) {
-        return entityRepository.selectCountWhere(records, batchSize);
+    public <R extends Record> long countMatches(@Nonnull Stream<R> records, int batchSize) {
+        return entityRepository.countMatches(records, batchSize);
     }
 
     /**

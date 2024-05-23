@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -208,103 +209,69 @@ public class QueryBuilderImpl<T, R, ID> implements QueryBuilder<T, R, ID> {
         return join(type, alias).process(getTemplate(function, false));
     }
 
+    // Define the raw templates
+    private static final StringTemplate RAW_AND = RAW." AND (";
+    private static final StringTemplate RAW_OR = RAW." OR (";
+    private static final StringTemplate RAW_CLOSE = RAW.")";
+
     @Override
-    public QueryBuilder<T, R, ID> where(@Nonnull Function<PredicateBuilder<T, R, ID>, WhereBuilder<T, R, ID>> expression) {
+    public QueryBuilder<T, R, ID> where(@Nonnull Function<WhereBuilder<T, R, ID>, PredicateBuilder<T, R, ID>> expression) {
         requireNonNull(expression, "expression");
-        class WhereBuilderImpl<TX, RX, IDX> implements WhereBuilder<TX, RX, IDX> {
-            private final List<StringTemplate> templates;
-            private final int nestLevel;
+        class PredicateBuilderImpl<TX, RX, IDX> implements PredicateBuilder<TX, RX, IDX> {
+            private final List<StringTemplate> templates = new ArrayList<>();
+            private final AtomicInteger nestLevel = new AtomicInteger(0);
 
-            public WhereBuilderImpl(@Nonnull List<StringTemplate> templates, int nestLevel) {
-                this.templates = List.copyOf(templates);
-                this.nestLevel = nestLevel;
-            }
-
-            private WhereBuilderImpl<TX, RX, IDX> withTemplate(@Nonnull StringTemplate template, int nestLevel) {
-                List<StringTemplate> copy = new ArrayList<>(templates);
-                copy.add(template);
-                while (nestLevel < this.nestLevel) {
-                    copy.add(RAW.")");
-                    nestLevel++;
-                }
-                return new WhereBuilderImpl<>(copy, nestLevel);
-            }
-
-            protected WhereBuilderImpl<TX, RX, IDX> invokeTemplateFunction(@Nonnull TemplateFunction function, boolean newLine) {
-                return withTemplate(getTemplate(function, newLine), nestLevel);
-            }
-
-            private QueryBuilder<TX, RX, IDX> build() {
-                List<StringTemplate> copy = new ArrayList<>(templates);
-                int nestLevel = this.nestLevel;
-                while (nestLevel > 0) {
-                    copy.add(RAW.")");
-                    nestLevel--;
-                }
-                //noinspection unchecked
-                return (QueryBuilder<TX, RX, IDX>) QueryBuilderImpl.this.withTemplate(RAW."\nWHERE \{new Where(new TemplateExpression(StringTemplate.combine(copy)), null)}");
-            }
-
-            // WhereBuilder methods.
-
-            @Override
-            public WhereBuilder<TX, RX, IDX> and(@Nonnull Function<PredicateBuilder<TX, RX, IDX>, WhereBuilder<TX, RX, IDX>> predicate) {
-                return predicate.apply(new PredicateBuilderImpl(RAW." AND (", nestLevel + 1));
+            PredicateBuilderImpl(@Nonnull StringTemplate template) {
+                templates.add(requireNonNull(template, "template"));
             }
 
             @Override
-            public WhereBuilder<TX, RX, IDX> or(@Nonnull Function<PredicateBuilder<TX, RX, IDX>, WhereBuilder<TX, RX, IDX>> predicate) {
-                return predicate.apply(new PredicateBuilderImpl(RAW." OR (", nestLevel + 1));
+            public PredicateBuilder<TX, RX, IDX> and(@Nonnull PredicateBuilder<TX, RX, IDX> predicate) {
+                templates.add(RAW_AND);
+                templates.addAll(((PredicateBuilderImpl<TX, RX, IDX>) predicate).templates);
+                templates.add(RAW_CLOSE);
+                return this;
             }
 
             @Override
-            public WhereBuilder<TX, RX, IDX> and(@Nonnull Object o) {
-                return withTemplate(RAW." AND \{new ObjectExpression(o)}", nestLevel);
+            public PredicateBuilder<TX, RX, IDX> or(@Nonnull PredicateBuilder<TX, RX, IDX> predicate) {
+                templates.add(RAW_OR);
+                templates.addAll(((PredicateBuilderImpl<TX, RX, IDX>) predicate).templates);
+                templates.add(RAW_CLOSE);
+                return this;
             }
 
-            @Override
-            public WhereBuilder<TX, RX, IDX> or(@Nonnull Object o) {
-                return withTemplate(RAW." OR \{new ObjectExpression(o)}", nestLevel);
-            }
-
-            public PredicateBuilder<TX, RX, IDX> newWherePredicate() {
-                return new PredicateBuilderImpl(RAW."", nestLevel);
-            }
-
-            class PredicateBuilderImpl implements PredicateBuilder<TX, RX, IDX> {
-                private final StringTemplate template;
-                private final int nestLevel;
-
-                PredicateBuilderImpl(@Nonnull StringTemplate template, int nestLevel) {
-                    this.template = template;
-                    this.nestLevel = nestLevel;
-                }
-
-                @Override
-                public WhereBuilder<TX, RX, IDX> process(StringTemplate template) throws PersistenceException {
-                    List<StringTemplate> templates = new ArrayList<>();
-                    templates.add(this.template);
-                    templates.add(template);
-                    return withTemplate(StringTemplate.combine(templates), nestLevel);
-                }
-
-                @Override
-                public WhereBuilder<TX, RX, IDX> template(@Nonnull TemplateFunction function) {
-                    List<StringTemplate> copy = new ArrayList<>(templates);
-                    copy.add(template);
-                    return new WhereBuilderImpl<TX, RX, IDX>(copy, nestLevel).invokeTemplateFunction(function, false);
-                }
-
-                @Override
-                public WhereBuilder<TX, RX, IDX> where(@Nonnull Object o) {
-                    List<StringTemplate> copy = new ArrayList<>(templates);
-                    copy.add(RAW."\{new ObjectExpression(o)}");
-                    return new WhereBuilderImpl<>(copy, nestLevel);
-                }
+            private List<StringTemplate> getTemplates() {
+                return templates;
             }
         }
-        var builder = expression.apply(new WhereBuilderImpl<T, R, ID>(List.of(), 0).newWherePredicate());
-        return ((WhereBuilderImpl<T, R, ID>) builder).build();
+        class WhereBuilderImpl<TX, RX, IDX> implements WhereBuilder<TX, RX, IDX> {
+            public WhereBuilderImpl() {
+            }
+
+            @Override
+            public PredicateBuilder<TX, RX, IDX> process(StringTemplate template) throws PersistenceException {
+                return new PredicateBuilderImpl<>(template);
+            }
+
+            @Override
+            public PredicateBuilder<TX, RX, IDX> template(@Nonnull TemplateFunction function) {
+                return new PredicateBuilderImpl<>(getTemplate(function, false));
+            }
+
+            @Override
+            public PredicateBuilder<TX, RX, IDX> matches(@Nonnull Object o) {
+                return new PredicateBuilderImpl<>(RAW."\{new ObjectExpression(o)}");
+            }
+
+            private QueryBuilder<TX, RX, IDX> build(List<StringTemplate> templates) {
+                //noinspection unchecked
+                return (QueryBuilder<TX, RX, IDX>) QueryBuilderImpl.this.withTemplate(RAW."\nWHERE \{new Where(new TemplateExpression(StringTemplate.combine(templates)), null)}");
+            }
+        }
+        var whereBuilder = new WhereBuilderImpl<T, R, ID>();
+        var predicate = expression.apply(whereBuilder);
+        return whereBuilder.build(((PredicateBuilderImpl<T, R, ID>) predicate).getTemplates());
     }
 
     private Query build(@Nonnull StringTemplate template) {

@@ -6,7 +6,7 @@
     <parent>
         <groupId>st.orm</groupId>
         <artifactId>storm-framework</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>storm-mariadb</artifactId>
@@ -93,7 +93,7 @@
         </dependency>
         <dependency>
             <groupId>st.orm</groupId>
-            <artifactId>mysql-storm</artifactId>
+            <artifactId>storm-mysql</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

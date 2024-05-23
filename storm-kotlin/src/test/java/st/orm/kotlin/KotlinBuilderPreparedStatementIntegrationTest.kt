@@ -55,7 +55,7 @@ open class KotlinBuilderPreparedStatementIntegrationTest {
         val ORM = ORM(dataSource)
         val list = ORM.query(Vet::class)
                 .where {
-                    it.where(1).or(2)
+                    it.matches(1).or(it.matches(2))
                 }
                 .toList()
         Assertions.assertEquals(2, list.size)
@@ -75,11 +75,10 @@ open class KotlinBuilderPreparedStatementIntegrationTest {
         val ORM = ORM(dataSource)
         val list = ORM.query(Vet::class)
                 .where {
-                    g1 -> g1.where(1).or {
-                        g2 -> g2.template {
+                    it.matches(1).or(
+                        it.template {
                             "${it.arg(Vet::class)}.id = ${it.arg(2)}"
-                        }
-                    }
+                        })
                 }
                 .toList()
         Assertions.assertEquals(2, list.size)

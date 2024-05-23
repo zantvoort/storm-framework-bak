@@ -45,7 +45,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @throws PersistenceException if the count operation fails due to underlying database issues, such as
      *                              connectivity.
      */
-    long selectCount();
+    long count();
 
     /**
      * Retrieves an entity based on its primary key.
@@ -453,7 +453,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @return the total count of entities matching the provided IDs.
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
-    long selectCount(@Nonnull Stream<ID> ids);
+    long count(@Nonnull Stream<ID> ids);
 
     /**
      * Counts the number of entities identified by the provided stream of IDs, with the counting process divided into
@@ -469,7 +469,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @return the total count of entities matching the provided IDs.
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
-    long selectCount(@Nonnull Stream<ID> ids, int batchSize);
+    long count(@Nonnull Stream<ID> ids, int batchSize);
 
     /**
      * Counts the specified record and all records associated with it based on relational mappings.
@@ -485,7 +485,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @throws PersistenceException if the counting operation fails due to underlying database issues, such as
      * connectivity problems, or if the entity parameter is null.
      */
-    long selectCountWhere(@Nonnull Record record);
+    long countMatches(@Nonnull Record record);
 
     /**
      * Retrieves a stream of entities based on a reference entity.
@@ -509,7 +509,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @throws PersistenceException if the retrieval operation fails due to underlying database issues, such as
      *                              connectivity problems, or if the entity parameter is null.
      */
-    Stream<E> selectWhere(@Nonnull Record record);
+    Stream<E> selectMatches(@Nonnull Record record);
 
     /**
      * Retrieves a stream of entities based on the specified reference entities.
@@ -538,7 +538,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @throws PersistenceException if the retrieval operation fails due to underlying database issues, such as
      *                              connectivity problems, or if the entities parameter is null.
      */
-    <R extends Record> Stream<E> selectWhere(@Nonnull Iterable<R> records);
+    <R extends Record> Stream<E> selectMatches(@Nonnull Iterable<R> records);
 
     /**
      * Retrieves a stream of entities based on a stream of reference records.
@@ -572,7 +572,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @throws PersistenceException if the retrieval operation fails due to underlying database issues, such as
      * connectivity problems, or if the entities parameter is null.
      */
-    <R extends Record> Stream<E> selectWhere(@Nonnull Stream<R> records);
+    <R extends Record> Stream<E> selectMatches(@Nonnull Stream<R> records);
 
     /**
      * Retrieves a stream of entities based on a stream of reference records.
@@ -601,7 +601,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @throws PersistenceException if the retrieval operation fails due to underlying database issues, such as
      * connectivity problems, or if the entities parameter is null.
      */
-    <R extends Record> Stream<E> selectWhere(@Nonnull Stream<R> records, int batchSize);
+    <R extends Record> Stream<E> selectMatches(@Nonnull Stream<R> records, int batchSize);
 
     /**
      * Counts the entities associated with the provided iterable of reference records using the maximum possible batch size.
@@ -615,7 +615,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @return the total count of entities associated with the provided reference records.
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
-    <R extends Record> long selectCountWhere(@Nonnull Iterable<R> records);
+    <R extends Record> long countMatches(@Nonnull Iterable<R> records);
 
     /**
      * Counts the entities associated with the provided stream of reference records using the default batch size.
@@ -629,7 +629,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @return the total count of entities associated with the provided reference records.
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
-    <R extends Record> long selectCountWhere(@Nonnull Stream<R> records);
+    <R extends Record> long countMatches(@Nonnull Stream<R> records);
 
     /**
      * Counts the entities associated with the provided stream of reference records, with the counting process divided into
@@ -646,7 +646,7 @@ public interface KEntityRepository<E extends Entity<ID>, ID> extends KRepository
      * @return the total count of entities associated with the provided reference records.
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
-    <R extends Record> long selectCountWhere(@Nonnull Stream<R> records, int batchSize);
+    <R extends Record> long countMatches(@Nonnull Stream<R> records, int batchSize);
 
     /**
      * Inserts entities in a batch mode to optimize performance and reduce database load.

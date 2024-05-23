@@ -10,9 +10,9 @@ import st.orm.spi.Providers;
 import st.orm.template.JoinType;
 import st.orm.template.QueryBuilder;
 import st.orm.template.QueryBuilder.JoinBuilder;
-import st.orm.template.QueryBuilder.PredicateBuilder;
-import st.orm.template.QueryBuilder.TypedJoinBuilder;
 import st.orm.template.QueryBuilder.WhereBuilder;
+import st.orm.template.QueryBuilder.TypedJoinBuilder;
+import st.orm.template.QueryBuilder.PredicateBuilder;
 import st.orm.template.TemplateFunction;
 
 import java.util.function.Function;
@@ -179,40 +179,6 @@ public class KQueryBuilderImpl<T, R, ID> implements KQueryBuilder<T, R, ID> {
         };
     }
 
-    static class KWhereBuilderImpl<TX, RX, IDX> implements KWhereBuilder<TX, RX, IDX> {
-        private final WhereBuilder<TX, RX, IDX> whereBuilder;
-
-        KWhereBuilderImpl(@Nonnull WhereBuilder<TX, RX, IDX> whereBuilder) {
-            this.whereBuilder = whereBuilder;
-        }
-
-        @Override
-        public KWhereBuilder<TX, RX, IDX> and(@Nonnull Function<KPredicateBuilder<TX, RX, IDX>, KWhereBuilder<TX, RX, IDX>> predicate) {
-            return new KWhereBuilderImpl<>(whereBuilder.and(wherePredicate -> {
-                var builder = predicate.apply(new KPredicateBuilderImpl<>(wherePredicate));
-                return ((KWhereBuilderImpl<TX, RX, IDX>) builder).whereBuilder;
-            }));
-        }
-
-        @Override
-        public KWhereBuilder<TX, RX, IDX> or(@Nonnull Function<KPredicateBuilder<TX, RX, IDX>, KWhereBuilder<TX, RX, IDX>> predicate) {
-            return new KWhereBuilderImpl<>(whereBuilder.or(WhereExpression -> {
-                var builder = predicate.apply(new KPredicateBuilderImpl<>(WhereExpression));
-                return ((KWhereBuilderImpl<TX, RX, IDX>) builder).whereBuilder;
-            }));
-        }
-
-        @Override
-        public KWhereBuilder<TX, RX, IDX> and(@Nonnull Object o) {
-            return new KWhereBuilderImpl<>(whereBuilder.and(o));
-        }
-
-        @Override
-        public KWhereBuilder<TX, RX, IDX> or(@Nonnull Object o) {
-            return new KWhereBuilderImpl<>(whereBuilder.or(o));
-        }
-    }
-
     static class KPredicateBuilderImpl<TX, RX, IDX> implements KPredicateBuilder<TX, RX, IDX> {
         private final PredicateBuilder<TX, RX, IDX> predicateBuilder;
 
@@ -221,26 +187,44 @@ public class KQueryBuilderImpl<T, R, ID> implements KQueryBuilder<T, R, ID> {
         }
 
         @Override
-        public KWhereBuilder<TX, RX, IDX> process(StringTemplate stringTemplate) throws PersistenceException {
-            return new KWhereBuilderImpl<>(predicateBuilder.process(stringTemplate));
+        public KPredicateBuilder<TX, RX, IDX> and(@Nonnull KPredicateBuilder<TX, RX, IDX> predicate) {
+            return new KPredicateBuilderImpl<>(predicateBuilder.and(((KPredicateBuilderImpl<TX, RX, IDX>) predicate).predicateBuilder));
         }
 
         @Override
-        public KWhereBuilder<TX, RX, IDX> template(@Nonnull TemplateFunction function) {
-            return new KWhereBuilderImpl<>(predicateBuilder.template(function));
+        public KPredicateBuilder<TX, RX, IDX> or(@Nonnull KPredicateBuilder<TX, RX, IDX> predicate) {
+            return new KPredicateBuilderImpl<>(predicateBuilder.or(((KPredicateBuilderImpl<TX, RX, IDX>) predicate).predicateBuilder));
+        }
+    }
+
+    static class KWhereBuilderImpl<TX, RX, IDX> implements KWhereBuilder<TX, RX, IDX> {
+        private final WhereBuilder<TX, RX, IDX> whereBuilder;
+
+        KWhereBuilderImpl(@Nonnull WhereBuilder<TX, RX, IDX> whereBuilder) {
+            this.whereBuilder = whereBuilder;
         }
 
         @Override
-        public KWhereBuilder<TX, RX, IDX> where(@Nonnull Object o) {
-            return new KWhereBuilderImpl<>(predicateBuilder.where(o));
+        public KPredicateBuilder<TX, RX, IDX> process(StringTemplate stringTemplate) throws PersistenceException {
+            return new KPredicateBuilderImpl<>(whereBuilder.process(stringTemplate));
+        }
+
+        @Override
+        public KPredicateBuilder<TX, RX, IDX> template(@Nonnull TemplateFunction function) {
+            return new KPredicateBuilderImpl<>(whereBuilder.template(function));
+        }
+
+        @Override
+        public KPredicateBuilder<TX, RX, IDX> matches(@Nonnull Object o) {
+            return new KPredicateBuilderImpl<>(whereBuilder.matches(o));
         }
     }
 
     @Override
-    public KQueryBuilder<T, R, ID> where(@Nonnull Function<KPredicateBuilder<T, R, ID>, KWhereBuilder<T, R, ID>> predicate) {
-        return new KQueryBuilderImpl<>(builder.where(predicateBuilder -> {
-            var builder = predicate.apply(new KPredicateBuilderImpl<>(predicateBuilder));
-            return ((KWhereBuilderImpl<T, R, ID>) builder).whereBuilder;
+    public KQueryBuilder<T, R, ID> where(@Nonnull Function<KWhereBuilder<T, R, ID>, KPredicateBuilder<T, R, ID>> predicate) {
+        return new KQueryBuilderImpl<>(builder.where(whereBuilder -> {
+            var builder = predicate.apply(new KWhereBuilderImpl<>(whereBuilder));
+            return ((KPredicateBuilderImpl<T, R, ID>) builder).predicateBuilder;
         }));
     }
 

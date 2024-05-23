@@ -97,7 +97,7 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity.
      */
     @Override
-    public long selectCount() {
+    public long count() {
         return selectTemplate(Count.class)."COUNT(*)"
                 .singleResult()
                 .count();
@@ -134,7 +134,7 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      */
     @Override
     public boolean exists(@Nonnull ID id) {
-        return selectCount(Stream.of(id)) > 0;
+        return count(Stream.of(id)) > 0;
     }
 
     /**
@@ -619,8 +619,8 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public long selectCount(@Nonnull Stream<ID> ids) {
-        return selectCount(ids, DEFAULT_BATCH_SIZE);
+    public long count(@Nonnull Stream<ID> ids) {
+        return count(ids, DEFAULT_BATCH_SIZE);
     }
 
     /**
@@ -638,7 +638,7 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public long selectCount(@Nonnull Stream<ID> ids, int batchSize) {
+    public long count(@Nonnull Stream<ID> ids, int batchSize) {
         try (ids) {  // Close the stream when done.
             return slice(ids, batchSize)
                     .mapToLong(slice -> selectTemplate(Count.class)."COUNT(*)"
@@ -672,7 +672,7 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entity parameter is null.
      */
     @Override
-    public Stream<E> selectWhere(@Nonnull Record record) {
+    public Stream<E> selectMatches(@Nonnull Record record) {
         return where(record).stream();
     }
 
@@ -704,8 +704,8 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entities parameter is null.
      */
     @Override
-    public <R extends Record> Stream<E> selectWhere(@Nonnull Iterable<R> entities) {
-        return selectWhere(toStream(entities), MAX_VALUE);
+    public <R extends Record> Stream<E> selectMatches(@Nonnull Iterable<R> entities) {
+        return selectMatches(toStream(entities), MAX_VALUE);
     }
 
     /**
@@ -723,7 +723,7 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entity parameter is null.
      */
     @Override
-    public long selectCountWhere(@Nonnull Record record) {
+    public long countMatches(@Nonnull Record record) {
         return selectTemplate(Count.class)."COUNT(*)"
                 .where(record)
                 .singleResult()
@@ -763,8 +763,8 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entities parameter is null.
      */
     @Override
-    public <R extends Record> Stream<E> selectWhere(@Nonnull Stream<R> records) {
-        return selectWhere(records, DEFAULT_BATCH_SIZE);
+    public <R extends Record> Stream<E> selectMatches(@Nonnull Stream<R> records) {
+        return selectMatches(records, DEFAULT_BATCH_SIZE);
     }
 
     /**
@@ -795,7 +795,7 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * connectivity problems, or if the entities parameter is null.
      */
     @Override
-    public <R extends Record> Stream<E> selectWhere(@Nonnull Stream<R> records, int batchSize) {
+    public <R extends Record> Stream<E> selectMatches(@Nonnull Stream<R> records, int batchSize) {
         return batch(records, batchSize, batch -> where(batch).stream());
     }
 
@@ -812,8 +812,8 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
     @Override
-    public <R extends Record> long selectCountWhere(@Nonnull Iterable<R> records) {
-        return this.selectCountWhere(toStream(records), MAX_VALUE);
+    public <R extends Record> long countMatches(@Nonnull Iterable<R> records) {
+        return this.countMatches(toStream(records), MAX_VALUE);
     }
 
     /**
@@ -828,8 +828,8 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * @return the total count of entities associated with the provided reference records.
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
-    public <R extends Record> long selectCountWhere(@Nonnull Stream<R> records) {
-        return selectCountWhere(records, DEFAULT_BATCH_SIZE);
+    public <R extends Record> long countMatches(@Nonnull Stream<R> records) {
+        return countMatches(records, DEFAULT_BATCH_SIZE);
     }
 
     /**
@@ -847,7 +847,7 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
      * @return the total count of entities associated with the provided reference records.
      * @throws PersistenceException if there is an error during the counting operation, such as connectivity issues.
      */
-    public <R extends Record> long selectCountWhere(@Nonnull Stream<R> records, int batchSize) {
+    public <R extends Record> long countMatches(@Nonnull Stream<R> records, int batchSize) {
         try (records) {  // Close the stream when done.
             return slice(records, batchSize)
                     .mapToLong(slice -> selectTemplate(Count.class)."COUNT(*)"
@@ -1252,6 +1252,4 @@ public class EntityRepositoryImpl<E extends Entity<ID>, ID>
                     });
         }
     }
-
-
 }

@@ -145,7 +145,7 @@ public class BuilderPreparedStatementIntegrationTest {
     public void testBuilderWithWhere() {
         var ORM = ORM(dataSource);
         var list = ORM.query(Vet.class)
-                .where(group -> group.where(1).or(2))
+                .where(it -> it.matches(1).or(it.matches(2)))
                 .toList();
         assertEquals(2, list.size());
     }
@@ -154,7 +154,7 @@ public class BuilderPreparedStatementIntegrationTest {
     public void testBuilderWithWhereTemplate() {
         var ORM = ORM(dataSource);
         var list = ORM.query(Vet.class)
-                .where(g1 -> g1.where(1).or(g2 -> g2."\{Vet.class}.id = 2"))
+                .where(it -> it.matches(1).or(it."\{Vet.class}.id = 2"))
                 .toList();
         assertEquals(2, list.size());
     }
@@ -163,7 +163,7 @@ public class BuilderPreparedStatementIntegrationTest {
     public void testBuilderWithWhereTemplateFunction() {
         var ORM = ORM(dataSource);
         var list = ORM.query(Vet.class)
-                .where(group -> group.template(_ -> "1 = 1"))
+                .where(it -> it.template(_ -> "1 = 1"))
                 .toList();
         assertEquals(6, list.size());
     }
@@ -172,7 +172,7 @@ public class BuilderPreparedStatementIntegrationTest {
     public void testBuilderWithWhereTemplateFunctionAfterOr() {
         var ORM = ORM(dataSource);
         var list = ORM.query(Vet.class)
-                .where(group -> group.where(1).or(g2 -> g2.template(context -> STR."\{context.arg(Vet.class)}.id = \{context.arg(2)}")))
+                .where(it -> it.matches(1).or(it.template(context -> STR."\{context.arg(Vet.class)}.id = \{context.arg(2)}")))
                 .toList();
         assertEquals(2, list.size());
     }
