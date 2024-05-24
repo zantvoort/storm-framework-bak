@@ -75,6 +75,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Character.isUpperCase;
 import static java.lang.Character.toLowerCase;
+import static java.lang.Long.toHexString;
 import static java.lang.StringTemplate.RAW;
 import static java.lang.System.getProperty;
 import static java.lang.ThreadLocal.withInitial;
@@ -322,6 +323,11 @@ public final class SqlTemplateImpl implements SqlTemplate {
 
         public void addParameterExtractor(@Nonnull Function<Record, List<PositionalParameter>> parameterExtractor) {
             parameterExtractors.add(parameterExtractor);
+        }
+
+        @Override
+        public String toString() {
+            return STR."\{getClass().getSimpleName()}@\{toHexString(System.identityHashCode(this))}";
         }
     }
 

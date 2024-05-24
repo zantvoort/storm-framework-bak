@@ -276,7 +276,7 @@ public class QueryBuilderImpl<T, R, ID> implements QueryBuilder<T, R, ID> {
 
     private Query build(@Nonnull StringTemplate template) {
         List<StringTemplate> copy = new ArrayList<>(templates);
-        if (!template.fragments().isEmpty() && !template.values().isEmpty()) {
+        if (!template.fragments().isEmpty()) {
             copy.add(RAW."\n");
         }
         copy.add(template);

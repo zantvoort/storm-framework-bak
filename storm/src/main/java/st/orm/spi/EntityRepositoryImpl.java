@@ -37,6 +37,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  */
+@SuppressWarnings("DuplicatedCode")
 public class EntityRepositoryImpl<E extends Entity<ID>, ID>
         extends QueryBuilderImpl<E, E, ID> implements EntityRepository<E, ID> {
 

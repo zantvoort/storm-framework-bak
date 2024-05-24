@@ -22,6 +22,7 @@ import st.orm.repository.Entity;
 import st.orm.repository.EntityRepository;
 import st.orm.spi.EntityRepositoryProvider;
 import st.orm.template.ColumnNameResolver;
+import st.orm.template.ForeignKeyResolver;
 import st.orm.template.SqlTemplateException;
 import st.orm.template.TableNameResolver;
 
@@ -36,15 +37,18 @@ public final class LazyFactoryImpl implements LazyFactory {
     private final QueryFactory factory;
     private final TableNameResolver tableNameResolver;
     private final ColumnNameResolver columnNameResolver;
+    private final ForeignKeyResolver foreignKeyResolver;
     private final Predicate<? super EntityRepositoryProvider> providerFilter;
 
     public LazyFactoryImpl(@Nonnull QueryFactory factory,
                            @Nullable TableNameResolver tableNameResolver,
                            @Nullable ColumnNameResolver columnNameResolver,
+                           @Nullable ForeignKeyResolver foreignKeyResolver,
                            @Nullable Predicate<? super EntityRepositoryProvider> providerFilter) {
         this.factory = Objects.requireNonNull(factory, "factory");
         this.tableNameResolver = tableNameResolver;
         this.columnNameResolver = columnNameResolver;
+        this.foreignKeyResolver = foreignKeyResolver;
         this.providerFilter = providerFilter;
     }
 
@@ -66,6 +70,7 @@ public final class LazyFactoryImpl implements LazyFactory {
                     factory,
                     tableNameResolver,
                     columnNameResolver,
+                    foreignKeyResolver,
                     providerFilter).repository(recordType);
             return repository.select(pk);
         });

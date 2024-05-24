@@ -26,6 +26,7 @@ import st.orm.spi.EntityRepositoryProvider;
 import st.orm.spi.ORMReflection;
 import st.orm.spi.Providers;
 import st.orm.template.ColumnNameResolver;
+import st.orm.template.ForeignKeyResolver;
 import st.orm.template.ORMRepositoryTemplate;
 import st.orm.template.Sql;
 import st.orm.template.SqlTemplateException;
@@ -52,8 +53,9 @@ public final class ORMRepositoryTemplateImpl extends ORMTemplateImpl implements 
     public ORMRepositoryTemplateImpl(@Nonnull QueryFactory factory,
                                      @Nullable TableNameResolver tableNameResolver,
                                      @Nullable ColumnNameResolver columnNameResolver,
+                                     @Nullable ForeignKeyResolver foreignKeyResolver,
                                      @Nullable Predicate<? super EntityRepositoryProvider> providerFilter) {
-        super(factory, tableNameResolver, columnNameResolver, providerFilter);
+        super(factory, tableNameResolver, columnNameResolver, foreignKeyResolver, providerFilter);
     }
 
     @Override

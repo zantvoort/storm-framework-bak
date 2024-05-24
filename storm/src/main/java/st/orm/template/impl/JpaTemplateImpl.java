@@ -171,6 +171,6 @@ public final class JpaTemplateImpl implements JpaTemplate {
                     }
                 };
             }
-        }, null, null, null);
+        }, null, null, null, null);
     }
 }

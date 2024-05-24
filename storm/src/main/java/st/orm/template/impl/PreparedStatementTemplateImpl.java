@@ -226,7 +226,7 @@ public final class PreparedStatementTemplateImpl implements PreparedStatementTem
 
     @Override
     public ORMRepositoryTemplate toORM() {
-        return new ORMRepositoryTemplateImpl(this, tableNameResolver, columnNameResolver, providerFilter);
+        return new ORMRepositoryTemplateImpl(this, tableNameResolver, columnNameResolver, foreignKeyResolver, providerFilter);
     }
 
     /**
